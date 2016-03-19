@@ -6,6 +6,8 @@ import android.content.Intent;
 import org.robolectric.annotation.Implementation;
 import org.robolectric.annotation.Implements;
 import org.robolectric.annotation.RealObject;
+import org.robolectric.internal.Shadow;
+import org.robolectric.util.ReflectionHelpers.ClassParameter;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -27,7 +29,9 @@ public class ShadowBroadcastReceiver {
   @Implementation
   public void onReceive(Context context, Intent intent) {
     if (abort == null || !abort.get()) {
-      receiver.onReceive(context, intent);
+      Shadow.directlyOn(receiver, BroadcastReceiver.class, "onReceive",
+          ClassParameter.fromComponentLists(
+              new Class[]{Context.class, Intent.class}, new Object[]{context, intent}));
     }
   }
 
